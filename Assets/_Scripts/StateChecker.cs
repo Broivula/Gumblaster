@@ -7,6 +7,8 @@ public class StateChecker : MonoBehaviour {
     public List<GameObject> gums;
     public GridManager gManager;
 
+    public GameObject[] gumPrefabs;
+    private GameObject gum_parent;
 
     public List<int> vertaisLista;
     public List<GameObject> destroyThese;
@@ -15,9 +17,17 @@ public class StateChecker : MonoBehaviour {
     public List<GameObject> horizontalList;
     public List<List<GameObject>> allRows;
 
+    [SerializeField]
+    private float SecretWaitTime;
 
+    public Transform[] spawnPoints;
+
+    [SerializeField]
+    private List<int> row0, row1, row2, row3, row4, row5, row6, row7, row8, row9;
+    private List<List<int>> allrows;
     private Dictionary<int, List<GameObject>> coordWithObj;
-    private Dictionary<int, List<int>> coordinatesList;
+
+    
 
 
 
@@ -25,176 +35,527 @@ public class StateChecker : MonoBehaviour {
     public void Start ()
     {
         gManager = GameObject.Find("Game_manager").GetComponent<GridManager>();
-        coordWithObj = new Dictionary<int, List<GameObject>>();
-        coordinatesList = new Dictionary<int, List<int>>();
-       
+        gum_parent = GameObject.Find("Gum_parent");
+     
+      //  coordinatesList = new Dictionary<int, List<int>>();
+
+        allrows = new List<List<int>>();
+        row0 = new List<int>();
+        allrows.Add(row0);
+        row1 = new List<int>();
+        allrows.Add(row1);
+        row2 = new List<int>();
+        allrows.Add(row2);
+        row3 = new List<int>();
+        allrows.Add(row3);
+        row4 = new List<int>();
+        allrows.Add(row4);
+        row5 = new List<int>();
+        allrows.Add(row5);
+       // row6 = new List<int>();
+       // allrows.Add(row6);
+       // row7 = new List<int>();
+      //  allrows.Add(row7);
+      //  row8 = new List<int>();
+      //  allrows.Add(row8);
+      //  row9 = new List<int>();
+      //  allrows.Add(row9);
+
+
+        vertaisLista = new List<int>();
+        destroyThese = new List<GameObject>();
+        verticalList = new List<GameObject>();
+        horizontalList = new List<GameObject>();
+
 
     }
 
     private void Update()
     {
-        if(Input.GetKeyUp(KeyCode.A))
+       if(Input.GetKeyUp(KeyCode.A))
         {
             CheckState();
         }
-
+        
     }
 
 
-    public void CheckState ()
+    public bool CheckState ()
     {
-        vertaisLista = new List<int>();
-        destroyThese = new List<GameObject>();
-        verticalList = new List<GameObject>();
-        horizontalList = new List<GameObject>();
+        bool resultOfChecking;
+        Debug.Log("checki alkaa");
+        
+        if(gums.Count <= 0)
         GetList();                                                        //hakee listan, jossa on kaikki spawnatut gameobjektit
 
 
 
+        if(destroyThese.Count <= 0)
+        {
+            CheckStateQuick();
+        }
+        
+   //     Debug.Log("horizontal list teko alkaa");
 
+      //  if(horizontalList.Count <= 0)
+      //  HorizontalList();
 
+   //     Debug.Log("horizontal list tehty " + horizontalList.Count);
+        // ------ HORIZONTAL CHECK ------
 
+        
 
-
-        HorizontalList();
-                // ------ HORIZONTAL CHECK ------
-                
+        /*
         for (int i = 0; i < gums.Count; i++)
         {
-            if (i > 1 && i<gums.Count-1)
+            if (i > 0 && i<gums.Count -1)
             {
                 if (GetValue(horizontalList[i]) == GetValue(horizontalList[i + 1]) && GetValue(horizontalList[i]) == GetValue(horizontalList[i - 1]))
                 {
                     if (YCoordinate(horizontalList[i]) == YCoordinate(horizontalList[i - 1]) && YCoordinate(horizontalList[i + 1]) == YCoordinate(horizontalList[i]))
                     {
                         Debug.Log("Kolme peräkkäin!");
-                            if(!destroyThese.Contains(horizontalList[i - 1]) && !destroyThese.Contains(horizontalList[i]) && !destroyThese.Contains(horizontalList[i + 1]))
-                        {
-                            destroyThese.Add(horizontalList[i - 1]);
-                            destroyThese.Add(horizontalList[i]);
-                            destroyThese.Add(horizontalList[i + 1]);
-                        }else if (!destroyThese.Contains(horizontalList[i - 1]) && !destroyThese.Contains(horizontalList[i]) && destroyThese.Contains(horizontalList[i + 1]))
-                        {
-                            destroyThese.Add(horizontalList[i - 1]);
-                            destroyThese.Add(horizontalList[i]);
-                        }else if (!destroyThese.Contains(horizontalList[i - 1]) && destroyThese.Contains(horizontalList[i]) && !destroyThese.Contains(horizontalList[i + 1]))
-                        {
-                            destroyThese.Add(horizontalList[i - 1]);
-                            destroyThese.Add(horizontalList[i + 1]);
-                        }else if(destroyThese.Contains(horizontalList[i - 1]) && destroyThese.Contains(horizontalList[i]) && !destroyThese.Contains(horizontalList[i + 1]))
-                        {
-                            destroyThese.Add(horizontalList[i]);
-                            destroyThese.Add(horizontalList[i + 1]);
-                        }
-                        else
-                        {
 
-                            Debug.Log("Kaikki olivat jo tuhottu");
+
+                        if(destroyThese.IndexOf(horizontalList[i-1]) < 0)
+                        {
+                            destroyThese.Add(horizontalList[i - 1]);
+                         //   gums.Remove(horizontalList[i - 1]);
+                        }
+                        if(destroyThese.IndexOf(horizontalList[i]) < 0)
+                        {
+                            destroyThese.Add(horizontalList[i]);
+                          //  gums.Remove(horizontalList[i]);
+                        }
+                        if (destroyThese.IndexOf(horizontalList[i + 1]) < 0)
+                        {
+                            destroyThese.Add(horizontalList[i + 1]);
+                          //  gums.Remove(horizontalList[i + 1]);
                         }
 
-  
-                        
-         
                     }
                 }
             }
         }
-        
-        VerticalList();
+        */
+        // if(verticalList.Count <= 0)
+        //  VerticalList();
 
 
 
 
         // --------- VERTICAL CHECK -----------
 
-        
-        for (int i = 0; i < verticalList.Count; i++)
+        /*  
+           for (int i = 0; i < verticalList.Count; i++)
+           {
+               if (i > 0 && i < verticalList.Count -1)
+               {
+                   if (GetValue(verticalList[i]) == GetValue(verticalList[i + 1]) && GetValue(verticalList[i]) == GetValue(verticalList[i - 1]))
+                   {
+
+
+                       if (XCoordinate(verticalList[i]) == XCoordinate(verticalList[i + 1]) && XCoordinate(verticalList[i - 1]) == XCoordinate(verticalList[i]))
+                       {
+                           Debug.Log("Kolme peräkkäin pystysuunnassa!");
+
+                           if(destroyThese.IndexOf(verticalList[i-1]) < 0)
+                           {
+                               destroyThese.Add(verticalList[i - 1]);
+                            //   gums.Remove(verticalList[i - 1]);
+                           }
+                           if (destroyThese.IndexOf(verticalList[i]) < 0)
+                           {
+                               destroyThese.Add(verticalList[i]);
+                            //   gums.Remove(verticalList[i]);
+                           }
+                           if (destroyThese.IndexOf(verticalList[i + 1]) < 0)
+                           {
+                               destroyThese.Add(verticalList[i + 1]);
+                            //   gums.Remove(verticalList[i + 1]);
+                           }
+
+                       }
+                   }
+               }
+           }
+
+
+           */
+
+
+
+
+        if (destroyThese.Count > 0)                              // --------JOS LÖYTYI TUHOTTAVAA ELI KOLME TAI ENEMMÄN RIVISSÄ
         {
-            if (i > 1 && i < verticalList.Count - 1)
+            destroyThese.Sort(delegate (GameObject a, GameObject b)
             {
-                if (GetValue(verticalList[i]) == GetValue(verticalList[i + 1]) && GetValue(verticalList[i]) == GetValue(verticalList[i - 1]))
+                return (a.GetComponent<LocationHolder>().getY()).CompareTo(b.GetComponent<LocationHolder>().getY());
+            });
+
+
+            destroyThese.Reverse();
+            StartCoroutine(DestroyInFashion());
+            resultOfChecking = true;
+        }
+        else
+        {                                                                                   //---------EI LÖYTYNYT, VAIHDA TAKAISIN PAIKOILLEEN
+            resultOfChecking = false;                                                       // ----- koska kolmea samaa ei löytynyt, mutta aikaisemmin saattoi löytyä,                                            
+                                                                                            // ----- spawnaa nyt uudet
+
+            if(gums.Count < 54 )                    //eli jos on vähemmän kuin 54 palloa pelissä aka juttuja tuhoutui
+            {
+
+                for (int i = 0; i < allrows.Count; i++)
                 {
-                    if (XCoordinate(verticalList[i]) == XCoordinate(verticalList[i - 1]) && XCoordinate(verticalList[i + 1]) == XCoordinate(verticalList[i]))
+                   
+                    if (allrows[i].Count > 0)
                     {
-                        Debug.Log("Kolme peräkkäin pystysuunnassa!");
+                     //   Debug.Log("spawnataan uudet.");
+                        for (int j = 0; j < allrows[i].Count; j++)
+                        {
+                            int random = Random.Range(0, gumPrefabs.Length);
+                            GameObject newGum;
+                            newGum = Instantiate(gumPrefabs[random], spawnPoints[i].position, spawnPoints[i].rotation) as GameObject;
+                            newGum.transform.parent = gum_parent.transform;
 
-                        if (!destroyThese.Contains(verticalList[i - 1]) && !destroyThese.Contains(verticalList[i]) && !destroyThese.Contains(verticalList[i + 1]))
-                        {
-                            destroyThese.Add(verticalList[i - 1]);
-                            destroyThese.Add(verticalList[i]);
-                            destroyThese.Add(verticalList[i + 1]);
-                        }
-                        else if (!destroyThese.Contains(verticalList[i - 1]) && !destroyThese.Contains(verticalList[i]) && destroyThese.Contains(verticalList[i + 1]))
-                        {
-                            destroyThese.Add(verticalList[i - 1]);
-                            destroyThese.Add(verticalList[i]);
-                        }
-                        else if (!destroyThese.Contains(verticalList[i - 1]) && destroyThese.Contains(verticalList[i]) && !destroyThese.Contains(verticalList[i + 1]))
-                        {
-                            destroyThese.Add(verticalList[i - 1]);
-                            destroyThese.Add(verticalList[i + 1]);
-                        }
-                        else if (destroyThese.Contains(verticalList[i - 1]) && destroyThese.Contains(verticalList[i]) && !destroyThese.Contains(verticalList[i + 1]))
-                        {
-                            destroyThese.Add(verticalList[i]);
-                            destroyThese.Add(verticalList[i + 1]);
-                        }
-                        else
-                        {
+                            gums.Add(newGum);
 
-                            Debug.Log("Kaikki olivat jo tuhottu");
+                            //uusi objekti on spawnattu, anna sille koordinaatit
+                            newGum.GetComponent<LocationHolder>().SetX(i);
+                            newGum.GetComponent<LocationHolder>().SetY(8);
+                            StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j));
+
+                         //   Debug.Log("uusi gum " + newGum);
+                        }
+                     
+                    }
+                }
+                foreach (List<int> lista in allrows)
+                {
+                    lista.Clear();
+                }
+
+              
+            }
+ 
+   
+        }
+
+       // StartCoroutine(DelayedCheck());
+        return resultOfChecking;
+    }
+
+    private IEnumerator DelayedCheck ()
+    {
+        yield return new WaitForSeconds(1f);
+        bool b = CheckStateQuick();
+        if (!b)
+        {
+            yield return null;
+        }
+        else
+        {
+            Invoke("CheckState", 1f);
+        }
+    }
+
+    
+
+    private bool CheckStateQuick ()
+    {
+        for (int i = 0; i < gums.Count; i++)
+        {
+            int xi = XCoordinate(gums[i]);
+            int yi = YCoordinate(gums[i]);
+            int valueI = GetValue(gums[i]);
+
+            for (int j = 0; j < gums.Count; j++)
+            {
+                int xj = XCoordinate(gums[j]);
+                int yj = YCoordinate(gums[j]);
+                int valueJ = GetValue(gums[j]);
+
+                for (int k = 0; k < gums.Count; k++)
+                {
+                    int xk = XCoordinate(gums[k]);
+                    int yk = YCoordinate(gums[k]);
+                    int valueK = GetValue(gums[k]);
+
+                    if (xi - xj == -1 && xi - xk == 1 && yi == yj && yi == yk && valueI == valueJ && valueI == valueK || yi - yj == -1 && yi - yk == 1 && xi == xj && xi == xk && valueI == valueJ && valueI == valueK)
+                    {
+                        Debug.Log("kolme rivissä");
+                        if (!destroyThese.Contains(gums[j]))
+                        {
+                            destroyThese.Add(gums[j]);
+
+                        }
+                        if (!destroyThese.Contains(gums[i]))
+                        {
+                            destroyThese.Add(gums[i]);
+
+                        }
+                        if (!destroyThese.Contains(gums[k]))
+                        {
+                            destroyThese.Add(gums[k]);
+
                         }
                     }
                 }
             }
         }
+
+        if(destroyThese.Count > 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+
+    private IEnumerator DestroyInFashion ()
+    {
+        if(destroyThese.Count <= 0)
+        {
+            yield return null;
+        }
+
         
+
+        foreach(GameObject gum in destroyThese.ToArray())
+        {
+            int XCoord = XCoordinate(gum);
+            int YCoord = YCoordinate(gum);
+            List<GameObject> list;
+            StartCoroutine(gum.GetComponent<MovingScript>().MoveTowardsThis(4, 1));
+            yield return new WaitForSeconds(0.15f);
+            //lähetä ylöspäin kaikille viesti, jotka eivät ole destroythese listassa, mutta samalla rivillä, että tulee yhden alaspäin
+            switch(XCoord)
+            {
+                case 0:                 //jos tuhottu esine on x0 rivillä
+                    list = gManager.ListGetter(0);
+                    row0.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if(YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //        Debug.Log("rivillä 0.");     
+
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 1:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(1);
+                    row1.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //     Debug.Log("rivillä 1.");
+                       
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 2:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(2);
+                    row2.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //   Debug.Log("rivillä 2.");
+                     
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+
+                case 3:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(3);
+                    row3.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //  Debug.Log("rivillä 3.");
+
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 4:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(4);
+                    row4.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //  Debug.Log("rivillä 4.");
+                          
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 5:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(5);
+                    row5.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //         Debug.Log("rivillä 5.");
+                           
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 6:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(6);
+                    row6.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //     Debug.Log("rivillä 6.");
+                         
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 7:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(7);
+                    row7.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //        Debug.Log("rivillä 7.");
+                       
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 8:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(8);
+                    row8.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //     Debug.Log("rivillä 8.");
+                            
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+
+                case 9:                 //jos tuhottu esine on x1 rivillä
+
+                    list = gManager.ListGetter(9);
+                    row9.Add(XCoord);
+                    foreach (GameObject gumRow in list.ToArray())
+                    {
+                        if (YCoordinate(gumRow) >= YCoord && destroyThese.IndexOf(gumRow) < 0)        //eli jos on tuhotun yläpuolella ja ei ole destroythese listassa
+                        {
+                            //          Debug.Log("rivillä 9.");
+                           
+                            StartCoroutine(gumRow.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
+                            yield return new WaitForSeconds(0.01f);
+                        }
+                    }
+                    break;
+            }
+            //toista jokin ääniefekti
+          //  Destroy(gum, 1.0f);
+        }
 
         foreach(GameObject gum in destroyThese)
         {
+            gums.Remove(gum);                                                                   //poista ensin listasta, joka sisältää kaikki pallot
+            verticalList.Remove(gum);
+            horizontalList.Remove(gum);
             Destroy(gum);
+            
+            yield return new WaitForSeconds(0.1f);
         }
 
-
-        //käske kaikkia jäljellä olevia liikkumaan alaspäin
-
-        foreach(GameObject gum in gums)
-        {
-        //lähetä movingscriptiin käsky, joka liikuttaa niitä alaspäin
-        }
-
+        
+        Debug.Log("lista lahetetty state heckerista");
+        gManager.ListSorter();
+        destroyThese.Clear();
+        CheckState();
+        yield return null;
     }
 
+   
+    /*
     public bool HorizontalList()
     {
         int counterX = 0;
         int counterY = 0;
+        horizontalList.Clear();
+
+      //  while (horizontalList.Count < gums.Count)
+       // {
 
 
-        while (horizontalList.Count < 100)
-        {
+            /*
    
             foreach (GameObject gum in gums)
             {
-               if (YCoordinate(gum) == counterY)
-               {
-                  if (XCoordinate(gum) == counterX)
+                if (gum != null)
+                {
+                    if (YCoordinate(gum) == counterY)
                     {
-                        horizontalList.Add(gum);
-                        counterX = counterX + 1;
-
-                        if(counterX > 9)
+                        if (XCoordinate(gum) == counterX)
                         {
-                            counterY = counterY + 1;
-                            counterX = 0;
+                            horizontalList.Add(gum);
+                            counterX = counterX + 1;
+
+                            if (counterX > 9)
+                            {
+                                counterY = counterY + 1;
+                                counterX = 0;
+                            }
+
                         }
 
                     }
-                       
-               }
+                }
                 
             }
-        }
+            
+        //}
 
         return true;
     }
@@ -202,74 +563,46 @@ public class StateChecker : MonoBehaviour {
     public bool VerticalList()
     {
 
-        verticalList.Clear();
+      //  verticalList.Clear();
 
         int counterX = 9;
         int counterY = 9;
 
-        while (verticalList.Count < 100)
+        
+        gums.Reverse();
+
+        while (verticalList.Count < gums.Count)
         {
             foreach (GameObject gum in gums)
             {
-                if (XCoordinate(gum) == counterX)
+                if (gum != null)
                 {
-                    if (YCoordinate(gum) == counterY)
+                    //  Debug.Log("tämä on valittu1");
+                    if (XCoordinate(gum) == counterX)
                     {
-                        
-                       // Debug.Log("tämä on valittu" + gum);
-                        verticalList.Add(gum);
-                        counterY = counterY - 1;
-
-                        if (counterY == -1)
+                        if (YCoordinate(gum) == counterY)
                         {
-                            counterX = counterX - 1;
-                            counterY = 9;
+
+                            verticalList.Add(gum);
+                            counterY = counterY - 1;
+
+                            if (counterY == -1)
+                            {
+                                counterX = counterX - 1;
+                                counterY = 9;
+                            }
                         }
                     }
-
-
                 }
             }
-
         }
+          
+
         
+
         return true;
     }
-
-
-    public bool VertaisLista ()
-    {
-        for (int i = 0; i < 10; i++)
-        {
-
-            for (int j = 0; j < 10; j++)
-            {
-
-                vertaisLista.Add(GetValue(ListInQuestion(i)[j]));
-
-                //   Debug.Log("lista " + ListInQuestion(i));
-                // Debug.Log("vertais " + GetValue(ListInQuestion(i)[j]) + " ja ii : " + i);
-                //Debug.Log("name " + name);
-            }
-        }
-        return true;
-    }
-
-    public List<int> VertaisLista (int i)
-    {
-        List<int> l = coordinatesList[i];
-
-        return l;
-    }
-
-
-    public List<GameObject> ListInQuestion(int i)
-    {
-        List<GameObject> l = coordWithObj[i];
-        //  Debug.Log("allrows " + allRows[i]);
-
-        return l;
-    }
+    */
 
 /*
     public bool SetLists()
@@ -414,7 +747,7 @@ public class StateChecker : MonoBehaviour {
 
     public List<GameObject> GetListOfObjects ()
     {
-        List<GameObject> l = gums;
+        List<GameObject> l = verticalList;
         return l;
     }
 

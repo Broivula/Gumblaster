@@ -7,18 +7,18 @@ public class LocationHolder : MonoBehaviour {
 
     public int xCoord, yCoord, value;
 
-    public void Start()
+    public void Awake()
     {
         if (gameObject.tag == "Blue")
             value = 1;
         else if (gameObject.tag == "Red")
-            value = 2;
+            value = 0;
         else if (gameObject.tag == "Green")
-            value = 3;
+            value = 2;
         else if (gameObject.tag == "Pink")
-            value = 4;
+            value = 3;
         else if (gameObject.tag == "Yellow")
-            value = 5;
+            value = 4;
     }
 
     public void SetX (int x)
