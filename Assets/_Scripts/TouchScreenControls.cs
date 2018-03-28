@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TouchScreenControls : MonoBehaviour {
+public class TouchScreenControls : MonoBehaviour
+{
 
-    private bool moveBool = false;
+    public bool moveBool = false;
     private bool checkingBool = false;
     private GameObject targetedObject;
     private GameObject otherTargetedObject;
@@ -17,26 +18,26 @@ public class TouchScreenControls : MonoBehaviour {
     public float speed;
     private float dragDist;
     int moveX, moveY;
-  
-    void Start ()
+
+    void Start()
     {
-	    gManager = GameObject.Find("Game_manager").GetComponent<GridManager>();
+        gManager = GameObject.Find("Game_manager").GetComponent<GridManager>();
         sChecker = GameObject.Find("Game_manager").GetComponent<StateChecker>();
 
         dragDist = Screen.height * 5 / 100;
     }
-	
-	// Update is called once per frame
-	void Update ()
+
+    // Update is called once per frame
+    void Update()
     {
 
 
 #if UNITY_ANDROID
-        if(Input.touchCount == 1)
+        if (Input.touchCount == 1)
         {
             Touch touch = Input.GetTouch(0);
 
-            if(touch.phase == TouchPhase.Began)
+            if (touch.phase == TouchPhase.Began)
             {
                 firstTouch = touch.position;
                 Ray ray = Camera.main.ScreenPointToRay(firstTouch);
@@ -49,31 +50,27 @@ public class TouchScreenControls : MonoBehaviour {
                     targetedObject = hit.transform.gameObject;
                     moveX = hit.transform.gameObject.GetComponent<LocationHolder>().xCoord;
                     moveY = hit.transform.gameObject.GetComponent<LocationHolder>().yCoord;
-                    moveBool = true;
                     originalPosition = targetedObject.transform.position;
 
 
 
                 }
             }
-            else if(touch.phase == TouchPhase.Moved)
-            {
-                lastTouch = touch.position;
-            }
-            else if(touch.phase == TouchPhase.Ended)
+
+            else if (touch.phase == TouchPhase.Moved)
             {
                 lastTouch = touch.position;
 
                 //katotaan paljonko sormea liikutettiin ja mihin suuntaan
-                if (Mathf.Abs(lastTouch.x - firstTouch.x) > dragDist || Mathf.Abs(lastTouch.y - firstTouch.y) > dragDist)
+                if (Mathf.Abs(lastTouch.x - firstTouch.x) > dragDist  && moveBool == false|| Mathf.Abs(lastTouch.y - firstTouch.y) > dragDist && moveBool == false)
                 {//It's a drag
                  //check if the drag is vertical or horizontal
                     if (Mathf.Abs(lastTouch.x - firstTouch.x) > Mathf.Abs(lastTouch.y - firstTouch.y))
                     {   //If the horizontal movement is greater than the vertical movement...
-                        if ((lastTouch.x > firstTouch.x)  && moveX < 5)  //If the movement was to the right)
+                        if ((lastTouch.x > firstTouch.x) && moveX < 5)  //If the movement was to the right)
                         {   //Right swipe
                             Debug.Log("Right Swipe");
-                            moveBool = false;
+                            moveBool = true;
                             StartCoroutine(targetedObject.GetComponent<MovingScript>().MoveTowardsThis(3, 1));
                             FindGum(3);
                             checkingBool = true;
@@ -81,7 +78,7 @@ public class TouchScreenControls : MonoBehaviour {
                         else if (moveX > 0)
                         {   //Left swipe
                             Debug.Log("Left Swipe");
-                            moveBool = false;
+                            moveBool = true;
                             StartCoroutine(targetedObject.GetComponent<MovingScript>().MoveTowardsThis(2, 1));
                             FindGum(2);
                             checkingBool = true;
@@ -92,7 +89,7 @@ public class TouchScreenControls : MonoBehaviour {
                         if (lastTouch.y > firstTouch.y && moveY < 8)  //If the movement was up
                         {   //Up swipe
                             Debug.Log("Up Swipe");
-                            moveBool = false;
+                            moveBool = true;
                             StartCoroutine(targetedObject.GetComponent<MovingScript>().MoveTowardsThis(1, 1));
                             FindGum(1);
                             checkingBool = true;
@@ -100,7 +97,7 @@ public class TouchScreenControls : MonoBehaviour {
                         else if (moveY > 0)
                         {   //Down swipe
                             Debug.Log("Down Swipe");
-                            moveBool = false;
+                            moveBool = true;
                             StartCoroutine(targetedObject.GetComponent<MovingScript>().MoveTowardsThis(0, 1));
                             FindGum(0);
                             checkingBool = true;
@@ -110,6 +107,7 @@ public class TouchScreenControls : MonoBehaviour {
                 else
                 {   //It's a tap as the drag distance is less than 20% of the screen height
                     Debug.Log("Tap");
+                  //  targetedObject = null;
 
                 }
 
@@ -118,19 +116,19 @@ public class TouchScreenControls : MonoBehaviour {
 #endif
 
 #if UNITY_EDITOR
-          Move();
-      
+        Move();
+
         if (Input.GetMouseButtonDown(0))
         {
             //jos painaa ruutua, ammu hiiren kohdalta raycast 
-        //    firstTouch = Input.mousePosition;
+            //    firstTouch = Input.mousePosition;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit, 100) && !moveBool)
             {
-          //      lastTouch = Input.mousePosition;
-                
+                //      lastTouch = Input.mousePosition;
+
                 print("Osui!!!");                           //jos osui johonkin
                 targetedObject = hit.transform.gameObject;
                 moveX = hit.transform.gameObject.GetComponent<LocationHolder>().xCoord;
@@ -138,7 +136,7 @@ public class TouchScreenControls : MonoBehaviour {
                 moveBool = true;
                 originalPosition = targetedObject.transform.position;
 
-             
+
 
             }
 
@@ -172,7 +170,7 @@ public class TouchScreenControls : MonoBehaviour {
             checkingBool = true;
         }
 
-        else if (Input.GetAxis("Mouse Y") > 0f && moveBool && !checkingBool &&  targetedObject && moveY < 8)
+        else if (Input.GetAxis("Mouse Y") > 0f && moveBool && !checkingBool && targetedObject && moveY < 8)
         {
             //liikkui ylös
             moveBool = false;
@@ -181,7 +179,7 @@ public class TouchScreenControls : MonoBehaviour {
             checkingBool = true;
         }
 
-        else if (Input.GetAxis("Mouse Y") < 0f && moveBool && !checkingBool &&  targetedObject && moveY > 0)
+        else if (Input.GetAxis("Mouse Y") < 0f && moveBool && !checkingBool && targetedObject && moveY > 0)
         {
             //liikkui alas
             moveBool = false;
@@ -194,24 +192,24 @@ public class TouchScreenControls : MonoBehaviour {
             //ei tehdä mitään
             return;
         }
-       
-       
+
+
 
     }
 
-    private void FindGum (int i)
+    private void FindGum(int i)
     {
         bool listBool = GetList();
-      //  Debug.Log("gums " + gums.Count);
-       // int targetY, targetX;
+        //  Debug.Log("gums " + gums.Count);
+        // int targetY, targetX;
 
-        switch(i)
+        switch (i)
         {
             case 0:
                 //liikutti alas
-                foreach(GameObject gum in gums)
+                foreach (GameObject gum in gums)
                 {
-                    if(gum.GetComponent<LocationHolder>().yCoord - moveY == -1 && gum.GetComponent<LocationHolder>().xCoord == moveX)
+                    if (gum.GetComponent<LocationHolder>().yCoord - moveY == -1 && gum.GetComponent<LocationHolder>().xCoord == moveX)
                     {
                         MovingScript mScript = gum.GetComponent<MovingScript>();
                         otherTargetedObject = gum;
@@ -221,7 +219,7 @@ public class TouchScreenControls : MonoBehaviour {
 
                         StartCoroutine(mScript.MoveTowardsThis(1, 1));
                         StartCoroutine(IsAnythingMoving(mScript));
-                       // CheckState();
+                        // CheckState();
                     }
                 }
                 break;
@@ -290,25 +288,25 @@ public class TouchScreenControls : MonoBehaviour {
 
         }
 
-      
 
-       
-        
+
+
+
     }
 
-    private IEnumerator IsAnythingMoving (MovingScript mS)
+    private IEnumerator IsAnythingMoving(MovingScript mS)
     {
-        while(mS.amIMoving)
+        while (mS.amIMoving)
         {
-         //   Debug.Log(mS.amIMoving + "amimoving");
-            if(!mS.amIMoving)
+            //   Debug.Log(mS.amIMoving + "amimoving");
+            if (!mS.amIMoving)
             {
-              //  CheckState();
+                //  CheckState();
             }
             yield return new WaitForEndOfFrame();
         }
         StartCoroutine(CheckState());
-      //  Debug.Log("isanythingmoving : tehty");
+        //  Debug.Log("isanythingmoving : tehty");
     }
 
     private IEnumerator CheckState()
@@ -316,9 +314,9 @@ public class TouchScreenControls : MonoBehaviour {
         checkingBool = sChecker.CheckState();
         Debug.Log("checkingbool : " + checkingBool);
         if (!checkingBool)
-        { 
+        {
             //jos tsekki oli valetta, palauta pallot
-            while(targetedObject.transform.position != originalPosition)
+            while (targetedObject.transform.position != originalPosition)
             {
                 targetedObject.transform.position = Vector3.MoveTowards(targetedObject.transform.position, originalPosition, (speed * Time.deltaTime));
                 otherTargetedObject.transform.position = Vector3.MoveTowards(otherTargetedObject.transform.position, otherOriginalPosition, (speed * Time.deltaTime));
@@ -336,7 +334,7 @@ public class TouchScreenControls : MonoBehaviour {
         }
 
         checkingBool = false;
-      
+
     }
 
     public bool GetList()

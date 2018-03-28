@@ -17,6 +17,8 @@ public class StateChecker : MonoBehaviour {
     public List<GameObject> horizontalList;
     public List<List<GameObject>> allRows;
 
+    private TouchScreenControls touchScreenControls;
+
     [SerializeField]
     private float SecretWaitTime;
 
@@ -34,8 +36,9 @@ public class StateChecker : MonoBehaviour {
 
     public void Start ()
     {
-        gManager = GameObject.Find("Game_manager").GetComponent<GridManager>();
+        gManager = gameObject.GetComponent<GridManager>();
         gum_parent = GameObject.Find("Gum_parent");
+        touchScreenControls = gameObject.GetComponent<TouchScreenControls>();
      
       //  coordinatesList = new Dictionary<int, List<int>>();
 
@@ -80,30 +83,30 @@ public class StateChecker : MonoBehaviour {
     }
 
 
-    public bool CheckState ()
+    public bool CheckState()
     {
         bool resultOfChecking;
         Debug.Log("checki alkaa");
-        
-        if(gums.Count <= 0)
-        GetList();                                                        //hakee listan, jossa on kaikki spawnatut gameobjektit
+
+        if (gums.Count <= 0)
+            GetList();                                                        //hakee listan, jossa on kaikki spawnatut gameobjektit
 
 
 
-        if(destroyThese.Count <= 0)
+        if (destroyThese.Count <= 0)
         {
             CheckStateQuick();
         }
-        
-   //     Debug.Log("horizontal list teko alkaa");
 
-      //  if(horizontalList.Count <= 0)
-      //  HorizontalList();
+        //     Debug.Log("horizontal list teko alkaa");
 
-   //     Debug.Log("horizontal list tehty " + horizontalList.Count);
+        //  if(horizontalList.Count <= 0)
+        //  HorizontalList();
+
+        //     Debug.Log("horizontal list tehty " + horizontalList.Count);
         // ------ HORIZONTAL CHECK ------
 
-        
+
 
         /*
         for (int i = 0; i < gums.Count; i++)
@@ -201,62 +204,73 @@ public class StateChecker : MonoBehaviour {
         else
         {                                                                                   //---------EI LÖYTYNYT, VAIHDA TAKAISIN PAIKOILLEEN
             resultOfChecking = false;                                                       // ----- koska kolmea samaa ei löytynyt, mutta aikaisemmin saattoi löytyä,                                            
-                                                                                            // ----- spawnaa nyt uudet
-
-            if(gums.Count < 54 )                    //eli jos on vähemmän kuin 54 palloa pelissä aka juttuja tuhoutui
-            {
-
-                for (int i = 0; i < allrows.Count; i++)
-                {
-                   
-                    if (allrows[i].Count > 0)
-                    {
-                     //   Debug.Log("spawnataan uudet.");
-                        for (int j = 0; j < allrows[i].Count; j++)
-                        {
-                            int random = Random.Range(0, gumPrefabs.Length);
-                            GameObject newGum;
-                            newGum = Instantiate(gumPrefabs[random], spawnPoints[i].position, spawnPoints[i].rotation) as GameObject;
-                            newGum.transform.parent = gum_parent.transform;
-
-                            gums.Add(newGum);
-
-                            //uusi objekti on spawnattu, anna sille koordinaatit
-                            newGum.GetComponent<LocationHolder>().SetX(i);
-                            newGum.GetComponent<LocationHolder>().SetY(9);
-                            StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j + 1));
-
-                         //   Debug.Log("uusi gum " + newGum);
-                        }
-                     
-                    }
-                }
-                foreach (List<int> lista in allrows)
-                {
-                    lista.Clear();
-                }
-
-              
-            }
- 
-   
+            SpawnNewGums();                                                                  // ----- spawnaa nyt uudet
+         //  OneLastCheck();
+            StartCoroutine(DelayedCheck());
+           
         }
 
-       // StartCoroutine(DelayedCheck());
         return resultOfChecking;
     }
 
-    private IEnumerator DelayedCheck ()
+    private void SpawnNewGums ()
     {
-        yield return new WaitForSeconds(1f);
-        bool b = CheckStateQuick();
-        if (!b)
+        if (gums.Count < 54)                                                       //eli jos on vähemmän kuin 54 palloa pelissä aka juttuja tuhoutui
         {
-            yield return null;
+
+            for (int i = 0; i < allrows.Count; i++)
+            {
+
+                if (allrows[i].Count > 0)
+                {
+                    //   Debug.Log("spawnataan uudet.");
+                    for (int j = 0; j < allrows[i].Count; j++)
+                    {
+                        int random = Random.Range(0, gumPrefabs.Length);
+                        GameObject newGum;
+                        newGum = Instantiate(gumPrefabs[random], spawnPoints[i].position, spawnPoints[i].rotation) as GameObject;
+                        newGum.transform.parent = gum_parent.transform;
+
+                        gums.Add(newGum);
+
+                        //uusi objekti on spawnattu, anna sille koordinaatit
+                        newGum.GetComponent<LocationHolder>().SetX(i);
+                        newGum.GetComponent<LocationHolder>().SetY(9);
+                        StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j + 1));
+
+                        //   Debug.Log("uusi gum " + newGum);
+                    }
+
+                }
+            }
+            foreach (List<int> lista in allrows)
+            {
+                lista.Clear();
+            }
+
+
+        }
+
+
+    }
+
+
+
+
+    private IEnumerator DelayedCheck()
+    {
+        yield return new WaitForSeconds(0.75f);
+        bool b = CheckStateQuick();
+   
+        if (b)
+        {
+            StartCoroutine(DestroyInFashion());
         }
         else
         {
-            Invoke("CheckState", 1f);
+            Debug.Log("now THIS should be the last message " + b);
+            touchScreenControls.moveBool = false;
+            yield return null;
         }
     }
 
@@ -499,7 +513,7 @@ public class StateChecker : MonoBehaviour {
           //  Destroy(gum, 1.0f);
         }
 
-        foreach(GameObject gum in destroyThese)
+        foreach(GameObject gum in destroyThese.ToArray())
         {
             gums.Remove(gum);                                                                   //poista ensin listasta, joka sisältää kaikki pallot
             verticalList.Remove(gum);

@@ -69,9 +69,11 @@ public class MovingScript : MonoBehaviour {
                     moveHere = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - amount, gameObject.transform.position.z);
                     while (transform.position != moveHere)
                     {
-
-                        transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
-                        yield return new WaitForEndOfFrame();
+                        if (gameObject.GetComponent<MovingScript>() == true)
+                        {
+                            transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
+                            yield return new WaitForEndOfFrame();
+                        }
                     }
                     locHol.SetY(locHol.getY() - amount);
                     amIMoving = false;
@@ -87,8 +89,11 @@ public class MovingScript : MonoBehaviour {
                     moveHere = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + amount, gameObject.transform.position.z);
                     while (transform.position != moveHere)
                     {
-                        transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
-                        yield return new WaitForEndOfFrame();
+                        if (gameObject.GetComponent<MovingScript>() == true)
+                        {
+                            transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
+                            yield return new WaitForEndOfFrame();
+                        }
                     }
                     locHol.SetY(locHol.getY() + 1);
                     amIMoving = false;
@@ -103,8 +108,11 @@ public class MovingScript : MonoBehaviour {
                     moveHere = new Vector3(gameObject.transform.position.x - 1, gameObject.transform.position.y, gameObject.transform.position.z);
                     while (transform.position != moveHere)
                     {
-                        transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
-                        yield return new WaitForEndOfFrame();
+                        if (gameObject.GetComponent<MovingScript>() == true)
+                        {
+                            transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
+                            yield return new WaitForEndOfFrame();
+                        }
                     }
                     locHol.SetX(locHol.getX() - 1);
                     amIMoving = false;
@@ -116,10 +124,14 @@ public class MovingScript : MonoBehaviour {
                 if(locHol.getX() < 9)
                 {
                     moveHere = new Vector3(gameObject.transform.position.x + 1, gameObject.transform.position.y, gameObject.transform.position.z);
+                    
                     while (transform.position != moveHere)
                     {
-                        transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
-                        yield return new WaitForEndOfFrame();
+                        if (gameObject.GetComponent<MovingScript>() == true)
+                        {
+                            transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime));
+                            yield return new WaitForEndOfFrame();
+                        }
                     }
                     locHol.SetX(locHol.getX() + 1);
                     amIMoving = false;
@@ -133,8 +145,11 @@ public class MovingScript : MonoBehaviour {
                 moveHere = new Vector3(gameObject.transform.position.x, gameObject.transform.position.y, gameObject.transform.position.z - 1);
                 while(transform.position != moveHere)
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime) * 2);
-                    yield return new WaitForEndOfFrame();
+                    if (gameObject.GetComponent<MovingScript>() == true)
+                    {
+                        transform.position = Vector3.MoveTowards(transform.position, moveHere, (speed * Time.deltaTime) * 2);
+                        yield return new WaitForEndOfFrame();
+                    }
                 }
                
                 break;
