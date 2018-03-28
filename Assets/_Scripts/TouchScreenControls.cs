@@ -118,7 +118,7 @@ public class TouchScreenControls : MonoBehaviour {
 #endif
 
 #if UNITY_EDITOR
-      //    Move();
+          Move();
       
         if (Input.GetMouseButtonDown(0))
         {
@@ -172,7 +172,7 @@ public class TouchScreenControls : MonoBehaviour {
             checkingBool = true;
         }
 
-        else if (Input.GetAxis("Mouse Y") > 0f && moveBool && !checkingBool &&  targetedObject && moveY < 9)
+        else if (Input.GetAxis("Mouse Y") > 0f && moveBool && !checkingBool &&  targetedObject && moveY < 8)
         {
             //liikkui ylös
             moveBool = false;
@@ -314,9 +314,9 @@ public class TouchScreenControls : MonoBehaviour {
     private IEnumerator CheckState()
     {
         checkingBool = sChecker.CheckState();
-
+        Debug.Log("checkingbool : " + checkingBool);
         if (!checkingBool)
-        {
+        { 
             //jos tsekki oli valetta, palauta pallot
             while(targetedObject.transform.position != originalPosition)
             {

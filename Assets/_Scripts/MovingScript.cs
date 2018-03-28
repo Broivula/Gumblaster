@@ -26,6 +26,7 @@ public class MovingScript : MonoBehaviour {
     public void AddCounter ()
     {
         counter++;
+        
     }
     /*
     public bool IsThereSomethingUnderMe(List<GameObject> list)

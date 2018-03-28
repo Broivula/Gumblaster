@@ -223,8 +223,8 @@ public class StateChecker : MonoBehaviour {
 
                             //uusi objekti on spawnattu, anna sille koordinaatit
                             newGum.GetComponent<LocationHolder>().SetX(i);
-                            newGum.GetComponent<LocationHolder>().SetY(8);
-                            StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j));
+                            newGum.GetComponent<LocationHolder>().SetY(9);
+                            StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j + 1));
 
                          //   Debug.Log("uusi gum " + newGum);
                         }
