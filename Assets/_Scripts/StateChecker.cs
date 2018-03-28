@@ -224,19 +224,19 @@ public class StateChecker : MonoBehaviour {
                 if (allrows[i].Count > 0)
                 {
                     //   Debug.Log("spawnataan uudet.");
-                    for (int j = 0; j < allrows[i].Count; j++)
+                    for (int j = allrows[i].Count; j > 0 ; j--)
                     {
                         int random = Random.Range(0, gumPrefabs.Length);
                         GameObject newGum;
-                        newGum = Instantiate(gumPrefabs[random], spawnPoints[i].position, spawnPoints[i].rotation) as GameObject;
+                        newGum = Instantiate(gumPrefabs[random], spawnPoints[i].position + new Vector3(0,  j, 0), spawnPoints[i].rotation) as GameObject;
                         newGum.transform.parent = gum_parent.transform;
 
                         gums.Add(newGum);
 
                         //uusi objekti on spawnattu, anna sille koordinaatit
                         newGum.GetComponent<LocationHolder>().SetX(i);
-                        newGum.GetComponent<LocationHolder>().SetY(9);
-                        StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, j + 1));
+                        newGum.GetComponent<LocationHolder>().SetY(9 + j);
+                        StartCoroutine(newGum.GetComponent<MovingScript>().MoveTowardsThis(0, allrows[i].Count + 1) );
 
                         //   Debug.Log("uusi gum " + newGum);
                     }
@@ -259,16 +259,21 @@ public class StateChecker : MonoBehaviour {
 
     private IEnumerator DelayedCheck()
     {
-        yield return new WaitForSeconds(0.75f);
-        bool b = CheckStateQuick();
+        yield return new WaitForSeconds(0.9f);
+        bool booleanBoi = CheckStateQuick();
    
-        if (b)
+        if (booleanBoi)
         {
+            destroyThese.Sort(delegate (GameObject a, GameObject b)
+            {
+                return (a.GetComponent<LocationHolder>().getY()).CompareTo(b.GetComponent<LocationHolder>().getY());
+            });
+            destroyThese.Reverse();
             StartCoroutine(DestroyInFashion());
         }
         else
         {
-            Debug.Log("now THIS should be the last message " + b);
+            Debug.Log("now THIS should be the last message " + booleanBoi);
             touchScreenControls.moveBool = false;
             yield return null;
         }
@@ -515,9 +520,13 @@ public class StateChecker : MonoBehaviour {
 
         foreach(GameObject gum in destroyThese.ToArray())
         {
+
+         //   gum.GetComponent<LocationHolder>().DestroyAnim();
             gums.Remove(gum);                                                                   //poista ensin listasta, joka sisältää kaikki pallot
             verticalList.Remove(gum);
             horizontalList.Remove(gum);
+          
+            
             Destroy(gum);
             
             yield return new WaitForSeconds(0.1f);
